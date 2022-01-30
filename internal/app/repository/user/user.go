@@ -12,7 +12,7 @@ func NewRepo(db Repository) (returnData Repository) {
 	}
 }
 
-func (r *repo) CreateUser(ctx context.Context, param User) (returnData CreateRes, err error) {
+func (r *repo) CreateUser(ctx context.Context, param User) (returnData Res, err error) {
 	returnData, err = r.DB.CreateUser(ctx, param)
 	if err != nil {
 		return

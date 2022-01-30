@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/aririfani/auth-app/config"
+	helper "github.com/aririfani/auth-app/internal/pkg/utils/generalhelper"
 	"time"
 )
 
@@ -22,7 +23,7 @@ func NewDB(cfg config.Config, d *sql.DB) Repository {
 	}
 }
 
-func (d *db) CreateUser(ctx context.Context, param User) (returnData CreateRes, err error) {
+func (d *db) CreateUser(ctx context.Context, param User) (returnData Res, err error) {
 	stmt, err := d.DB.Prepare(QueryCreateUser)
 
 	if err != nil {
@@ -32,11 +33,19 @@ func (d *db) CreateUser(ctx context.Context, param User) (returnData CreateRes, 
 
 	defer stmt.Close()
 
+	generatePassword := helper.GenerateString(4)
+	password, err := helper.EncryptString(generatePassword)
+
+	if err != nil {
+		err = errors.New(fmt.Sprintf("%s", err))
+		return
+	}
+
 	result, err := stmt.Exec(
 		param.UserName,
 		param.Phone,
 		time.Now(),
-		param.Password,
+		password,
 		param.Role,
 	)
 
@@ -51,11 +60,12 @@ func (d *db) CreateUser(ctx context.Context, param User) (returnData CreateRes, 
 		return
 	}
 
-	returnData = CreateRes{
+	returnData = Res{
 		ID:       lastInsertID,
 		UserName: param.UserName,
 		Phone:    param.Phone,
 		Role:     param.Role,
+		Password: password,
 	}
 
 	return

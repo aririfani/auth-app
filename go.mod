@@ -8,5 +8,6 @@ require (
 	github.com/spf13/cobra v1.3.0
 	github.com/spf13/viper v1.10.1
 	github.com/ulule/deepcopier v0.0.0-20200430083143-45decc6639b6
+	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5
 	gorm.io/gorm v1.22.5
 )
