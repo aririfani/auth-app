@@ -2,8 +2,12 @@ package user
 
 import (
 	"context"
+	"database/sql"
+	"errors"
+	"fmt"
 	"github.com/aririfani/auth-app/internal/app/repository"
 	"github.com/aririfani/auth-app/internal/app/repository/user"
+	helper "github.com/aririfani/auth-app/internal/pkg/utils/generalhelper"
 	"github.com/ulule/deepcopier"
 )
 
@@ -17,10 +21,20 @@ func NewSrv(repo repository.Repositories) (returnData Service) {
 	}
 }
 
-func (s *srv) CreateUser(ctx context.Context, u User) (returnData user.CreateRes, err error) {
-	var userRepo user.User
-	_ = deepcopier.Copy(u).To(&userRepo)
-	returnData, err = s.Repo.User().CreateUser(ctx, userRepo)
+func (s *srv) CreateUser(ctx context.Context, u User) (returnData user.Res, err error) {
+	returnData, err = s.Repo.User().GetUserByUsername(ctx, u.UserName)
+
+	if err == sql.ErrNoRows {
+		var userRepo user.User
+		_ = deepcopier.Copy(u).To(&userRepo)
+		returnData, err = s.Repo.User().CreateUser(ctx, userRepo)
+	}
+
+	returnData.Password, err = helper.DecryptString(returnData.Password)
+	if err != nil {
+		err = errors.New(fmt.Sprintf("%s", err))
+		return
+	}
 
 	return
 }
