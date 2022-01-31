@@ -32,8 +32,6 @@ func NewConfig() Config {
 		panic(fmt.Errorf("Config error: %s", err))
 	}
 
-	fmt.Printf("=> config file: %s\n", c.Env.ConfigFileUsed())
-
 	return c
 }
 

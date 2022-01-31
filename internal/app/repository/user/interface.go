@@ -6,5 +6,5 @@ import (
 
 type Repository interface {
 	CreateUser(ctx context.Context, param User) (returnData Res, err error)
-	GetUserByUsername(ctx context.Context, userName string) (returnData Res, err error)
+	GetUserByField(ctx context.Context, field string, value string) (returnData Res, err error)
 }

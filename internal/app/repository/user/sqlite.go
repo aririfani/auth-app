@@ -11,9 +11,9 @@ import (
 )
 
 type db struct {
-	Cfg               config.Config
-	DB                *sql.DB
-	StmtGetByUsername *sql.Stmt
+	Cfg            config.Config
+	DB             *sql.DB
+	StmtGetByField *sql.Stmt
 }
 
 func NewDB(cfg config.Config, d *sql.DB) Repository {
@@ -71,16 +71,19 @@ func (d *db) CreateUser(ctx context.Context, param User) (returnData Res, err er
 	return
 }
 
-func (d *db) GetUserByUsername(ctx context.Context, userName string) (returnData Res, err error) {
-	if d.StmtGetByUsername == nil {
-		d.StmtGetByUsername, err = d.DB.Prepare(QueryGetUserByUsername)
-		if err != nil {
-			err = errors.New(fmt.Sprintf("%s", err))
-			return
-		}
+func (d *db) GetUserByField(ctx context.Context, field string, value string) (returnData Res, err error) {
+	if d.StmtGetByField != nil {
+		d.StmtGetByField = nil
 	}
 
-	rows, err := d.StmtGetByUsername.QueryContext(ctx, userName)
+	var query = fmt.Sprintf(QueryGetUserByField, field, "'"+value+"'")
+	d.StmtGetByField, err = d.DB.Prepare(query)
+	if err != nil {
+		err = errors.New(fmt.Sprintf("%s", err))
+		return
+	}
+
+	rows, err := d.StmtGetByField.QueryContext(ctx)
 	if err != nil {
 		err = errors.New(fmt.Sprintf("%s", err))
 		return
