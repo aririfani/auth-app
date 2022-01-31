@@ -6,6 +6,7 @@ import (
 	"errors"
 	"github.com/aririfani/auth-app/internal/app/service"
 	"github.com/aririfani/auth-app/internal/app/service/user"
+	"github.com/golang-jwt/jwt"
 	"io/ioutil"
 	"net/http"
 )
@@ -14,6 +15,7 @@ type Handler interface {
 	CreateUser(w http.ResponseWriter, r *http.Request) (resp interface{}, err error)
 	GetUserByUserName(w http.ResponseWriter, r *http.Request) (resp interface{}, err error)
 	Login(w http.ResponseWriter, r *http.Request) (res interface{}, err error)
+	GetClaimUser(w http.ResponseWriter, r *http.Request) (res interface{}, err error)
 }
 
 type userServ struct {
@@ -39,6 +41,8 @@ func (u *userServ) CreateUser(w http.ResponseWriter, r *http.Request) (resp inte
 
 	resp, err = u.service.User().CreateUser(ctx, request)
 
+	w.Header().Add("Content-Type", "application/json")
+
 	return
 }
 
@@ -52,6 +56,8 @@ func (u *userServ) GetUserByUserName(w http.ResponseWriter, r *http.Request) (re
 		err = errors.New("err data notfound")
 		return
 	}
+
+	w.Header().Add("Content-Type", "application/json")
 
 	return
 }
@@ -68,6 +74,21 @@ func (u *userServ) Login(w http.ResponseWriter, r *http.Request) (resp interface
 	}
 
 	resp, err = u.service.User().Login(ctx, request)
+
+	w.Header().Add("Content-Type", "application/json")
+
+	return
+}
+
+func (u *userServ) GetClaimUser(w http.ResponseWriter, r *http.Request) (resp interface{}, err error) {
+	resp = user.ClaimRes{
+		UserName:     r.Context().Value("claims").(jwt.MapClaims)["Username"].(string),
+		Phone:        r.Context().Value("claims").(jwt.MapClaims)["Phone"].(string),
+		RegisteredAt: r.Context().Value("claims").(jwt.MapClaims)["RegisteredAt"].(string),
+		Role:         r.Context().Value("claims").(jwt.MapClaims)["Role"].(string),
+	}
+
+	w.Header().Add("Content-Type", "application/json")
 
 	return
 }

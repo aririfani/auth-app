@@ -54,6 +54,7 @@ func (s *server) Router(handler handler.Handler) (w chicustom.Router) {
 		router.Use(middleware.JWTAuthorization)
 		router.Action(chicustom.NewRest(http.MethodPost, "/user", handler.UserHandler().CreateUser))
 		router.Action(chicustom.NewRest(http.MethodGet, "/user", handler.UserHandler().GetUserByUserName))
+		router.Action(chicustom.NewRest(http.MethodGet, "/user/claim", handler.UserHandler().GetClaimUser))
 	})
 
 	w.Route("/v1/auth", func(r chi.Router) {
