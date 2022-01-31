@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"github.com/aririfani/auth-app/internal/app/middleware"
 	"log"
 	"net/http"
 	"os"
@@ -50,8 +51,14 @@ func (s *server) Router(handler handler.Handler) (w chicustom.Router) {
 	w = chicustom.NewRouter(chi.NewRouter())
 	w.Route("/v1", func(r chi.Router) {
 		router := r.(chicustom.Router)
+		router.Use(middleware.JWTAuthorization)
 		router.Action(chicustom.NewRest(http.MethodPost, "/user", handler.UserHandler().CreateUser))
 		router.Action(chicustom.NewRest(http.MethodGet, "/user", handler.UserHandler().GetUserByUserName))
+	})
+
+	w.Route("/v1/auth", func(r chi.Router) {
+		router := r.(chicustom.Router)
+		router.Action(chicustom.NewRest(http.MethodPost, "/", handler.UserHandler().Login))
 	})
 
 	return

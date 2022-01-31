@@ -21,8 +21,8 @@ func (r *repo) CreateUser(ctx context.Context, param User) (returnData Res, err 
 	return
 }
 
-func (r *repo) GetUserByUsername(ctx context.Context, userName string) (returnData Res, err error) {
-	returnData, err = r.DB.GetUserByUsername(ctx, userName)
+func (r *repo) GetUserByField(ctx context.Context, field string, value string) (returnData Res, err error) {
+	returnData, err = r.DB.GetUserByField(ctx, field, value)
 	if err != nil {
 		return
 	}

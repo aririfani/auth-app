@@ -13,6 +13,7 @@ import (
 type Handler interface {
 	CreateUser(w http.ResponseWriter, r *http.Request) (resp interface{}, err error)
 	GetUserByUserName(w http.ResponseWriter, r *http.Request) (resp interface{}, err error)
+	Login(w http.ResponseWriter, r *http.Request) (res interface{}, err error)
 }
 
 type userServ struct {
@@ -51,6 +52,22 @@ func (u *userServ) GetUserByUserName(w http.ResponseWriter, r *http.Request) (re
 		err = errors.New("err data notfound")
 		return
 	}
+
+	return
+}
+
+func (u *userServ) Login(w http.ResponseWriter, r *http.Request) (resp interface{}, err error) {
+	ctx := r.Context()
+	bodyByte, _ := ioutil.ReadAll(r.Body)
+
+	var request user.UserLogin
+	err = json.Unmarshal(bodyByte, &request)
+	if err != nil || request == (user.UserLogin{}) {
+		err = errors.New("error payload")
+		return
+	}
+
+	resp, err = u.service.User().Login(ctx, request)
 
 	return
 }

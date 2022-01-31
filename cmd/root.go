@@ -46,7 +46,7 @@ func start() {
 	done := make(chan bool, 1)
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt)
-	srv := service.NewService(repository.NewRepo(cfg))
+	srv := service.NewService(repository.NewRepo(cfg), cfg)
 
 	s := server.NewServer(
 		net.JoinHostPort(cfg.GetString("server.host"), cfg.GetString("server.port")),

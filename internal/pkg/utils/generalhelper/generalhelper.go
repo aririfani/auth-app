@@ -30,9 +30,9 @@ func GenerateString(length int) string {
 	return StringWithCharset(length, charset)
 }
 
-func EncryptString(message string) (string, error) {
+func EncryptString(value string) (string, error) {
 	key := []byte("0123456789abcdef")
-	byteMsg := []byte(message)
+	byteMsg := []byte(value)
 	block, err := aes.NewCipher([]byte(key))
 	if err != nil {
 		err = errors.New(fmt.Sprintf("could not create new cipher: %s", err))
@@ -52,9 +52,9 @@ func EncryptString(message string) (string, error) {
 	return base64.StdEncoding.EncodeToString(cipherText), nil
 }
 
-func DecryptString(message string) (string, error) {
+func DecryptString(value string) (string, error) {
 	key := []byte("0123456789abcdef")
-	cipherText, err := base64.StdEncoding.DecodeString(message)
+	cipherText, err := base64.StdEncoding.DecodeString(value)
 	if err != nil {
 		err = errors.New(fmt.Sprintf("could not base64 decode: %s", err))
 		return "", err
@@ -78,4 +78,18 @@ func DecryptString(message string) (string, error) {
 	stream.XORKeyStream(cipherText, cipherText)
 
 	return string(cipherText), nil
+}
+
+func CompareStringValid(valueString string, valueEncrypt string) (bool, error) {
+	valDecrypt, err := DecryptString(valueEncrypt)
+	if err != nil {
+		err = errors.New(fmt.Sprintf("error decrypt: %s", err))
+		return false, err
+	}
+
+	if valueString == valDecrypt {
+		return true, nil
+	}
+
+	return false, err
 }
