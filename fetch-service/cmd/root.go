@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/aririfani/auth-app/fetch-service/internal/app/repository"
 	"github.com/aririfani/auth-app/fetch-service/internal/app/service"
+	"github.com/patrickmn/go-cache"
 	"log"
 	"net"
 	"net/http"
@@ -45,6 +46,7 @@ func start() {
 	cfg := config.NewConfig()
 	done := make(chan bool, 1)
 	quit := make(chan os.Signal, 1)
+	withCache := cache.New(5*time.Minute, 10*time.Minute)
 	signal.Notify(quit, os.Interrupt)
 	httpClient := &http.Client{
 		Timeout: time.Second * 10,
@@ -56,7 +58,7 @@ func start() {
 		},
 	}
 
-	srv := service.NewService(repository.NewRepo(cfg, httpClient), cfg)
+	srv := service.NewService(repository.NewRepo(cfg, httpClient, withCache), cfg)
 
 	s := server.NewServer(
 		net.JoinHostPort(cfg.GetString("server.host"), cfg.GetString("server.port")),

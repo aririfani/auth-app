@@ -23,3 +23,12 @@ func (s *srv) FetchDataCommodity() (res []commodity.Commodity, err error) {
 
 	return
 }
+
+func (s *srv) FetchDataCommodityByProvince(provinceName string, sorted bool, sortedType string) (res []commodity.Commodity, err error) {
+	res, err = s.Repo.Commodity().FetchDataCommodityByProvince(provinceName, sorted, sortedType)
+	if err != nil {
+		return
+	}
+
+	return
+}
