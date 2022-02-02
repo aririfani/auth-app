@@ -55,6 +55,13 @@ func (s *server) Router(handler handler.Handler) (w chicustom.Router) {
 		router.Action(chicustom.NewRest(http.MethodGet, "/", handler.CommodityHandler().GetCommodity))
 	})
 
+	w.Route("/v1/commodity/admin", func(r chi.Router) {
+		router := r.(chicustom.Router)
+		router.Use(middleware.JWTAuthorization)
+		router.Use(middleware.AdminRoleMiddleware)
+		router.Action(chicustom.NewRest(http.MethodGet, "/", handler.CommodityHandler().GetDataCommodityByProvince))
+	})
+
 	return
 }
 
